@@ -58,7 +58,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          if [ "$(gh api repos/${{ inputs.tap_owner }}/homebrew-${{ inputs.tap_name }}/contents/Formula/${{ inputs.formula_name }}.rb | jq 'has("size")')" = "false" ]; then
+          if [ "$(gh api repos/${{ inputs.tap_owner }}/homebrew-${{ inputs.tap_name }}/contents/Formula/${{ inputs.formula_name }}.rb | jq 'has("size")')" = "true" ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "exists=false" >> $GITHUB_OUTPUT
