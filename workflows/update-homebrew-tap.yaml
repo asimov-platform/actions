@@ -94,7 +94,7 @@ jobs:
         id: pull-bottles
         uses: actions/download-artifact@v4
         with:
-          pattern: bottles_*
+          pattern: bottles-*
           merge-multiple: true
           github-token: ${{ steps.current-app-token.outputs.token }}
       - name: Publish bottles
