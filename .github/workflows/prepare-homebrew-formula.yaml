@@ -50,7 +50,7 @@ jobs:
           app-id: ${{ secrets.ASIMOV_APP_ID }}
           private-key: ${{ secrets.ASIMOV_APP_PRIVATE_KEY }}
           owner: ${{ inputs.tap_owner }}
-          repositories: ${{ inputs.tap_name }}
+          repositories: homebrew-${{ inputs.tap_name }}
           permission-contents: write
       - name: Check formula
         id: check-formula

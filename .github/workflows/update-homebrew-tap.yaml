@@ -53,7 +53,7 @@ jobs:
           private-key: ${{ secrets.ASIMOV_APP_PRIVATE_KEY }}
           permission-contents: write
           owner: ${{ inputs.tap_owner }}
-          repositories: ${{ inputs.tap_name }}
+          repositories: homebrew-${{ inputs.tap_name }}
       - name: Obtain token for formula repository
         uses: actions/create-github-app-token@v2
         id: current-app-token
