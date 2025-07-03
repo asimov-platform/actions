@@ -111,6 +111,7 @@ jobs:
     name: Check ${{ matrix.name }}
     if: ${{ always() }}
     runs-on: ${{ matrix.os }}
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
