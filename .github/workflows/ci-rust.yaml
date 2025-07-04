@@ -227,9 +227,12 @@ jobs:
               }
 
               for (let job of response.data.jobs) {
-                if (job.name.startsWith('Check') && job.name != formatting_job.name &&
+                // Turn "ci / ci / Check Windows" -> "Check Windows"
+                let jobName = job.name.split(" / ").pop();
+
+                if (jobName.startsWith('Check') && job.name != formatting_job.name &&
                     (VERBOSE || job.conclusion == 'failure')) {
-                  let platform = job.name.split(' ')[1];
+                  let platform = jobName.split(' ')[1];
                   for (let step of job.steps) {
                     if ((step.name.startsWith('Build ') || step.name.startsWith('Run ')) &&
                         (VERBOSE || step.conclusion == 'failure')) {
