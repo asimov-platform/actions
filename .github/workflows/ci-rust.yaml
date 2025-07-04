@@ -111,7 +111,6 @@ jobs:
     name: Check ${{ matrix.name }}
     if: ${{ always() }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -163,14 +162,15 @@ jobs:
   review-pr:
     name: Review PR
     runs-on: ubuntu-24.04
-    if: ${{ inputs.review_pr && github.event_name == 'pull_request_target' }}
+    if: ${{ always() && inputs.review_pr && github.event_name == 'pull_request_target' }}
     needs: [check-formatting, check-targets]
     permissions:
       actions: read
       contents: read
       pull-requests: write
     steps:
-      - id: check-token
+      - name: Check if should obtain token
+        id: check-token
         run: |
           if [ "${{ secrets.ASIMOV_APP_ID != '' }}" == "true" || \
                 "${{ secrets.ASIMOV_APP_PRIVATE_KEY != '' }}" == "true" ]; then
