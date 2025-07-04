@@ -195,14 +195,10 @@ jobs:
             if (${{ needs.check-formatting.result != 'success' }} ||
                 ${{ needs.check-targets.result != 'success' }}) {
               let FORMATTING_JOB_NAME = 'Check formatting';
-              let VERBOSE = true;
               let response = undefined;
 
-              let body = `
-            ## ⚠️ CI failed
-
-            | Platform | Name | Status | Details |
-            | --- | --- | --- | --- |\n`;
+              let all_items = "";
+              let failed_items = "";
 
               function get_job_url(job_id) {
                 return `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/job/${job_id}?check_suite_focus=true`;
@@ -220,22 +216,26 @@ jobs:
               });
 
               let formatting_job = response.data.jobs.find(job => job.name.includes(FORMATTING_JOB_NAME));
-              if (formatting_job != undefined && (VERBOSE || formatting_job.conclusion == 'failure')) {
+              if (formatting_job != undefined) {
                 let succeed = formatting_job.conclusion == 'success' ? '✅' : '❌';
                 let url = get_job_url(formatting_job.id);
-                body += `| All | Formatting | ${succeed} | [Details](${url}) |\n`;
+                let text = `| All | Formatting | ${succeed} | [Details](${url}) |\n`;
+
+                if (formatting_job.conclusion == 'failure') {
+                  failed_items += text;
+                }
+
+                all_items += text;
               }
 
               for (let job of response.data.jobs) {
                 // Turn "ci / ci / Check Windows" -> "Check Windows"
-                let jobName = job.name.split(" / ").pop();
+                let job_name = job.name.split(" / ").pop();
 
-                if (jobName.startsWith('Check') && job.name != formatting_job.name &&
-                    (VERBOSE || job.conclusion == 'failure')) {
-                  let platform = jobName.split(' ')[1];
+                if (job_name.startsWith('Check') && job.name != formatting_job.name) {
+                  let platform = job_name.split(' ')[1];
                   for (let step of job.steps) {
-                    if ((step.name.startsWith('Build ') || step.name.startsWith('Run ')) &&
-                        (VERBOSE || step.conclusion == 'failure')) {
+                    if (step.name.startsWith('Build ') || step.name.startsWith('Run ')) {
                       let name = step.name;
                       let icon = '';
                       switch (step.conclusion) {
@@ -254,12 +254,36 @@ jobs:
                           icon = '❓';
                           break;
                       }
+
                       let url = get_step_url(job.id, step.number);
-                      body += `| ${platform} | ${name} | ${icon} | [Details](${url}) |\n`;
+                      let text = `| ${platform} | ${name} | ${icon} | [Details](${url}) |\n`;
+
+                      if (step.conclusion == 'failure') {
+                        failed_items += text;
+                      }
+
+                      all_items += text;
                     }
                   }
                 }
               }
+
+              let body = `
+            ## ⚠️ CI failed
+
+            <details>
+            <summary>Show all</summary>
+
+            | Platform | Name | Status | Details |
+            | --- | --- | --- | --- |
+            ${all_items}
+
+            </details>
+
+            | Platform | Name | Status | Details |
+            | --- | --- | --- | --- |
+            ${failed_items}
+            `;
 
               await github.rest.pulls.createReview({
                 ...context.repo,
