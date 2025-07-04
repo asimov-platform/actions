@@ -216,7 +216,7 @@ jobs:
               response = await github.rest.actions.listJobsForWorkflowRunAttempt({
                 ...context.repo,
                 run_id: context.runId,
-                attempt_number: context.runAttempt || 1
+                attempt_number: ${{ github.run_attempt }}
               });
 
               let formatting_job = response.data.jobs.find(job => job.name.includes(FORMATTING_JOB_NAME));
