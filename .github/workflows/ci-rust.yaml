@@ -93,7 +93,7 @@ jobs:
           toolchain: stable
           components: rustfmt
       - name: Check formatting
-        run: cargo +${{ steps.install-rust.outputs.name }} fmt --all -- --check 2>/dev/null
+        run: cargo +${{ steps.install-rust.outputs.name }} fmt --all -- --check --color always 2>/dev/null
   check-targets:
     strategy:
       fail-fast: false
