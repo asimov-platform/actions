@@ -108,7 +108,7 @@ jobs:
             custom_step: ${{ inputs.macos_dependencies }}
           - enabled: ${{ inputs.build_windows }}
             name: Windows
-            target: x86_64-pc-windows-gnu
+            target: x86_64-pc-windows-msvc
             os: windows-2025
             custom_step: ${{ inputs.windows_dependencies }}
     name: Check targets
