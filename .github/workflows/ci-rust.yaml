@@ -100,65 +100,32 @@ jobs:
             name: Linux
             target: x86_64-unknown-linux-gnu
             os: ubuntu-24.04
+            custom_step: ${{ inputs.linux_dependencies }}
           - enabled: ${{ inputs.build_macos }}
             name: macOS
             target: x86_64-apple-darwin
-            os: macos-latest
+            os: macos-15
+            custom_step: ${{ inputs.macos_dependencies }}
           - enabled: ${{ inputs.build_windows }}
             name: Windows
             target: x86_64-pc-windows-gnu
-            os: windows-latest
-    name: Check ${{ matrix.name }}
+            os: windows-2025
+            custom_step: ${{ inputs.windows_dependencies }}
+    name: Check targets
     if: ${{ always() }}
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-      - name: Install Linux dependencies
-        if: ${{ matrix.name == 'Linux' }}
-        run: ${{ inputs.linux_dependencies }}
-      - name: Install macOS dependencies
-        if: ${{ matrix.name == 'macOS' }}
-        run: ${{ inputs.macos_dependencies }}
-      - name: Install Windows dependencies
-        if: ${{ matrix.name == 'Windows' }}
-        run: ${{ inputs.windows_dependencies }}
-      - name: Install Rust
-        id: install-rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: 1.85.0
-          components: rustfmt
-          targets: ${{ matrix.target }}
-      - name: Build library
-        id: check-lib
-        if: ${{ inputs.check_lib }}
-        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ matrix.target }} --workspace --keep-going --lib
-      - name: Build binaries
-        id: check-bins
-        if: ${{ inputs.check_bins }}
-        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ matrix.target }} --workspace --keep-going --bins
-      - name: Build tests
-        id: check-tests
-        if: ${{ inputs.check_tests && steps.check-bins.outcome == 'success' }}
-        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ matrix.target }} --workspace --keep-going --tests
-      - name: Build examples
-        id: check-examples
-        if: ${{ inputs.check_examples && steps.check-bins.outcome == 'success' }}
-        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ matrix.target }} --workspace --keep-going --examples
-      - name: Run tests
-        id: run-tests
-        if: ${{ steps.check-tests.outcome == 'success' }}
-        run: |
-          cargo +${{ steps.install-rust.outputs.name }} test --target ${{ matrix.target }} --workspace --tests --no-fail-fast
-      - name: Run doctests
-        id: run-doctests
-        if: ${{ inputs.check_doctests && steps.check-tests.outcome == 'success' }}
-        run: |
-          cargo +${{ steps.install-rust.outputs.name }} test --target ${{ matrix.target }} --workspace --doc --no-fail-fast
+    uses: asimov-platform/actions/.github/workflows/ci-rust-job.yaml@master
+    with:
+      enabled: ${{ matrix.enabled }}
+      name: ${{ matrix.name }}
+      os: ${{ matrix.os }}
+      target: ${{ matrix.target }}
+      toolchain: 1.85.0
+      custom_step: ${{ matrix.custom_step }}
+      check_lib: ${{ inputs.check_lib }}
+      check_bins: ${{ inputs.check_bins }}
+      check_tests: ${{ inputs.check_tests }}
+      check_examples: ${{ inputs.check_examples }}
+      check_doctests: ${{ inputs.check_doctests }}
   review-pr:
     name: Review PR
     runs-on: ubuntu-24.04

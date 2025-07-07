@@ -1,0 +1,87 @@
+# See: https://docs.github.com/en/actions/writing-workflows
+---
+name: Rust CI job
+
+on:
+  workflow_call:
+    inputs:
+      enabled:
+        required: true
+        type: boolean
+      name:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      target:
+        required: true
+        type: string
+      toolchain:
+        required: true
+        type: string
+      custom_step:
+        required: false
+        type: string
+      check_lib:
+        required: true
+        type: boolean
+      check_bins:
+        required: true
+        type: boolean
+      check_tests:
+        required: true
+        type: boolean
+      check_examples:
+        required: true
+        type: boolean
+      check_doctests:
+        required: true
+        type: boolean
+
+jobs:
+  check-targets:
+    name: Check ${{ inputs.name }}
+    if: ${{ inputs.enabled }}
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Install dependencies
+        if: ${{ inputs.custom_step != '' }}
+        run: ${{ inputs.custom_step }}
+      - name: Install Rust
+        id: install-rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ inputs.toolchain }}
+          targets: ${{ inputs.target }}
+      - name: Build library
+        id: check-lib
+        if: ${{ inputs.check_lib }}
+        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ inputs.target }} --workspace --keep-going --lib
+      - name: Build binaries
+        id: check-bins
+        if: ${{ inputs.check_bins }}
+        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ inputs.target }} --workspace --keep-going --bins
+      - name: Build tests
+        id: check-tests
+        if: ${{ inputs.check_tests && steps.check-bins.outcome == 'success' }}
+        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ inputs.target }} --workspace --keep-going --tests
+      - name: Build examples
+        id: check-examples
+        if: ${{ inputs.check_examples && steps.check-bins.outcome == 'success' }}
+        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ inputs.target }} --workspace --keep-going --examples
+      - name: Run tests
+        id: run-tests
+        if: ${{ steps.check-tests.outcome == 'success' }}
+        run: |
+          cargo +${{ steps.install-rust.outputs.name }} test --target ${{ inputs.target }} --workspace --tests --no-fail-fast
+      - name: Run doctests
+        id: run-doctests
+        if: ${{ inputs.check_doctests && steps.check-tests.outcome == 'success' }}
+        run: |
+          cargo +${{ steps.install-rust.outputs.name }} test --target ${{ inputs.target }} --workspace --doc --no-fail-fast
