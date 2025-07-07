@@ -245,6 +245,8 @@ jobs:
             | --- | --- | --- | --- |
             ${all_items}
 
+            =============================================
+
             </details>
 
             | Platform | Name | Status | Details |
