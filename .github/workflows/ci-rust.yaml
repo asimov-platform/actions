@@ -72,6 +72,9 @@ on:
 permissions:
   contents: read
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
   check-formatting:
     name: Check formatting
