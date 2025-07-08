@@ -70,6 +70,8 @@ on:
         required: true
       ASIMOV_APP_PRIVATE_KEY:
         required: true
+      CRATES_TOKEN:
+        required: false
 
 jobs:
   prepare-homebrew:
@@ -181,6 +183,5 @@ jobs:
     if: ${{ inputs.update_crates_io }}
     needs: release
     secrets:
-      ASIMOV_APP_ID: ${{ secrets.ASIMOV_APP_ID }}
-      ASIMOV_APP_PRIVATE_KEY: ${{ secrets.ASIMOV_APP_PRIVATE_KEY }}
+      CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
     uses: asimov-platform/actions/.github/workflows/update-crates-io.yaml@master
