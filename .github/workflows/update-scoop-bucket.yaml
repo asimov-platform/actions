@@ -73,7 +73,7 @@ jobs:
 
           foreach ($asset in $packages) {
             Write-Host "Processing $($asset.name)"
-            $manifest_name = $asset.name.TrimEnd('-windows-x64.zip')
+            $manifest_name = $asset.name -replace '-windows-x64\.zip$', ''
             $manifest_path = "./bucket/$manifest_name.json"
 
             if (Test-Path -Path $manifest_path) {
