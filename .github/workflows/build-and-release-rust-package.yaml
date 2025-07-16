@@ -25,6 +25,45 @@ on:
         required: false
         type: boolean
         default: false
+      linux_x86_dependencies:
+        required: false
+        description: |
+          Linux x86 dependencies step. Will be executed before the build.
+          Takes precedence over `linux_dependencies`.
+        type: string
+      linux_arm_dependencies:
+        required: false
+        description: |
+          Linux ARM dependencies step. Will be executed before the build.
+          Takes precedence over `linux_dependencies`.
+        type: string
+      linux_dependencies:
+        required: false
+        description: |
+          Linux dependencies step. Will be executed before the build.
+        type: string
+      macos_x86_dependencies:
+        required: false
+        description: |
+          macOS x86 dependencies step. Will be executed before the build.
+          Takes precedence over `macos_dependencies`.
+        type: string
+      macos_arm_dependencies:
+        required: false
+        description: |
+          macOS ARM dependencies step. Will be executed before the build.
+          Takes precedence over `macos_dependencies`.
+        type: string
+      macos_dependencies:
+        required: false
+        description: |
+          macOS dependencies step. Will be executed before the build.
+        type: string
+      windows_dependencies:
+        required: false
+        description: |
+          Windows dependencies step. Will be executed before the build.
+        type: string
       build-linux-x86-gnu:
         required: false
         description: Build Linux x86 GNU binary?
@@ -100,37 +139,44 @@ jobs:
             build-homebrew-bottle: ${{ inputs.update_homebrew_tap }}
             use-zigbuild: true
             glibc-version: 2.28
+            custom-step: ${{ inputs.linux_x86_dependencies || inputs.linux_dependencies }}
           - enabled: ${{ inputs.build-linux-arm-gnu }}
             os: ubuntu-latest
             artifact: linux-arm-gnu
             target: aarch64-unknown-linux-gnu
             use-zigbuild: true
             glibc-version: 2.28
+            custom-step: ${{ inputs.linux_arm_dependencies || inputs.linux_dependencies }}
           - enabled: ${{ inputs.build-linux-x86-musl }}
             os: ubuntu-latest
             artifact: linux-x86-musl
             target: x86_64-unknown-linux-musl
             use-zigbuild: true
+            custom-step: ${{ inputs.linux_x86_dependencies || inputs.linux_dependencies }}
           - enabled: ${{ inputs.build-linux-arm-musl }}
             os: ubuntu-latest
             artifact: linux-arm-musl
             target: aarch64-unknown-linux-musl
             use-zigbuild: true
+            custom-step: ${{ inputs.linux_arm_dependencies || inputs.linux_dependencies }}
           - enabled: ${{ inputs.build-macos-x86 }}
             os: macos-13
             artifact: macos-x86
             target: x86_64-apple-darwin
             build-homebrew-bottle: ${{ inputs.update_homebrew_tap }}
+            custom-step: ${{ inputs.macos_x86_dependencies || inputs.macos_dependencies }}
           - enabled: ${{ inputs.build-macos-arm }}
             os: macos-15
             artifact: macos-arm
             target: aarch64-apple-darwin
             build-homebrew-bottle: ${{ inputs.update_homebrew_tap }}
+            custom-step: ${{ inputs.macos_arm_dependencies || inputs.macos_dependencies }}
           - enabled: ${{ inputs.build-windows }}
             os: ${{ inputs.build-windows-native && 'windows-latest' || 'ubuntu-latest' }}
             artifact: windows-x64
             target: ${{ inputs.build-windows-native && 'x86_64-pc-windows-msvc' || 'x86_64-pc-windows-gnu' }}
             extension: exe
+            custom-step: ${{ inputs.windows_dependencies }}
     name: Build module
     uses: asimov-platform/actions/.github/workflows/build-rust-package.yaml@master
     secrets:
@@ -141,6 +187,7 @@ jobs:
       os: ${{ matrix.os }}
       artifact: ${{ matrix.artifact }}
       target: ${{ matrix.target }}
+      custom_step: ${{ matrix.custom-step }}
       build_homebrew_bottle: ${{ matrix.build-homebrew-bottle || false }}
       bump_homebrew_formula: ${{ inputs.update_homebrew_tap && needs.prepare-homebrew.outputs.bump_formula == 'true' || false }}
       use_zigbuild: ${{ matrix.use-zigbuild || false }}

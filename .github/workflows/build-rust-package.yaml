@@ -18,6 +18,9 @@ on:
       target:
         required: true
         type: string
+      custom_step:
+        required: false
+        type: string
       build_homebrew_bottle:
         required: false
         type: boolean
@@ -54,6 +57,9 @@ jobs:
     if: ${{ inputs.enabled }}
     runs-on: ${{ inputs.os }}
     steps:
+      - name: Install dependencies
+        if: ${{ inputs.custom_step != '' }}
+        run: ${{ inputs.custom_step }}
       - name: Build
         uses: asimov-platform/build-rust-action@v6
         with:
