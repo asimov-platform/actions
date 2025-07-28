@@ -37,6 +37,10 @@ on:
       check_lib:
         required: true
         type: boolean
+      check_lib_no_default_features:
+        required: false
+        type: boolean
+        default: false
       check_bins:
         required: true
         type: boolean
@@ -77,6 +81,10 @@ jobs:
         id: check-lib
         if: ${{ inputs.check_lib }}
         run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ inputs.target }} --workspace --keep-going --lib
+      - name: Build library (no default features)
+        id: check-lib-no-default-features
+        if: ${{ inputs.check_lib_no_default_features }}
+        run: cargo +${{ steps.install-rust.outputs.name }} check --target ${{ inputs.target }} --workspace --keep-going --lib --no-default-features
       - name: Build binaries
         id: check-bins
         if: ${{ inputs.check_bins }}
