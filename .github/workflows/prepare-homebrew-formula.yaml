@@ -27,6 +27,10 @@ on:
         required: false
         type: string
         default: ${{ github.event.repository.name }}
+      depends_on_openssl:
+        required: false
+        type: boolean
+        default: false
     outputs:
       bump_formula:
         value: ${{ jobs.update-homebrew-tap.outputs.bump_formula }}
@@ -81,6 +85,8 @@ jobs:
       - name: Create formula
         if: ${{ steps.check-formula.outputs.exists == 'false' }}
         shell: pwsh
+        env:
+          DEPENDS_ON_OPENSSL: ${{ inputs.depends_on_openssl }}
         run: |
           echo "HOMEBREW_NO_ENV_HINTS=TRUE" >> $GITHUB_ENV
           brew tap ${{ inputs.tap_owner }}/${{ inputs.tap_name }}
@@ -112,6 +118,11 @@ jobs:
           Invoke-WebRequest -Uri $tag_url -OutFile $tag_path
           $sha256 = (Get-FileHash -Path $tag_path -Algorithm SHA256).Hash.ToLower()
 
+          $deps = 'depends_on "rust" => :build'
+          if ($env:DEPENDS_ON_OPENSSL -eq 'true') {
+              $deps += "`n" + 'depends_on "openssl" => :build'
+          }
+
           $formula = @'
           class {0} < Formula
             desc "{1}"
@@ -126,7 +137,7 @@ jobs:
               strategy :github_latest
             end
 
-            depends_on "rust" => :build
+          {6}
 
             def install
               system "cargo", "install", *std_cargo_args
@@ -142,7 +153,8 @@ jobs:
             "https://github.com/${{ github.repository }}", `
             $tag_url, `
             $sha256, `
-            "https://github.com/${{ github.repository }}.git"
+            "https://github.com/${{ github.repository }}.git", `
+            ($deps -replace "(?m)^", "  ") # indent
 
           cd "$(brew --repository ${{ inputs.tap_owner }}/${{ inputs.tap_name }})"
 

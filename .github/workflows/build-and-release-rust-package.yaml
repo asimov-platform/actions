@@ -25,6 +25,10 @@ on:
         required: false
         type: boolean
         default: false
+      depends_on_openssl:
+        required: false
+        type: boolean
+        default: false
       linux_x86_dependencies:
         required: false
         description: |
@@ -124,6 +128,8 @@ jobs:
     secrets:
       ASIMOV_APP_ID: ${{ secrets.ASIMOV_APP_ID }}
       ASIMOV_APP_PRIVATE_KEY: ${{ secrets.ASIMOV_APP_PRIVATE_KEY }}
+    with:
+      depends_on_openssl: ${{ inputs.depends_on_openssl }}
 
   build:
     needs: prepare-homebrew
