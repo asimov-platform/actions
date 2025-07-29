@@ -18,6 +18,10 @@ on:
         required: false
         type: boolean
         default: true
+      build_whole_workspace:
+        required: false
+        type: boolean
+        default: true
       build_linux:
         required: false
         type: boolean
@@ -127,6 +131,7 @@ jobs:
       os: ${{ matrix.os }}
       target: ${{ matrix.target }}
       toolchain: 1.85.0
+      build_whole_workspace: ${{ inputs.build_whole_workspace }}
       custom_step: ${{ matrix.custom_step }}
       check_lib: ${{ inputs.check_lib }}
       check_lib_no_default_features: ${{ inputs.check_lib_no_default_features }}
