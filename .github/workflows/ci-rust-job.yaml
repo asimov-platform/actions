@@ -83,6 +83,7 @@ jobs:
           targets: ${{ inputs.target }}
       - name: Prepare
         id: prepare
+        shell: bash
         run: |
           if ${{ inputs.build_whole_workspace }}; then
             echo "workspace=--workspace" >> $GITHUB_OUTPUT
