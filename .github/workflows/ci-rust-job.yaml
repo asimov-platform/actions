@@ -38,6 +38,9 @@ on:
       custom_step:
         required: false
         type: string
+      additional_build_args:
+        required: false
+        type: string
       check_lib:
         required: true
         type: boolean
@@ -93,23 +96,23 @@ jobs:
       - name: Build library
         id: check-lib
         if: ${{ inputs.check_lib }}
-        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --lib
+        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --lib ${{ inputs.additional_build_args }}
       - name: Build library (no default features)
         id: check-lib-no-default-features
         if: ${{ inputs.check_lib_no_default_features }}
-        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --lib --no-default-features
+        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --lib --no-default-features ${{ inputs.additional_build_args }}
       - name: Build binaries
         id: check-bins
         if: ${{ inputs.check_bins }}
-        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --bins
+        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --bins ${{ inputs.additional_build_args }}
       - name: Build tests
         id: check-tests
         if: ${{ inputs.check_tests && steps.check-bins.outcome == 'success' }}
-        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --tests
+        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --tests ${{ inputs.additional_build_args }}
       - name: Build examples
         id: check-examples
         if: ${{ inputs.check_examples && steps.check-bins.outcome == 'success' }}
-        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --examples
+        run: cargo +${{ steps.install-rust.outputs.name }} build --target ${{ inputs.target }} ${{ steps.prepare.outputs.workspace }} --keep-going --examples ${{ inputs.additional_build_args }}
       - name: Run tests
         id: run-tests
         if: ${{ steps.check-tests.outcome == 'success' }}

@@ -51,6 +51,9 @@ on:
       windows_dependencies:
         required: false
         type: string
+      additional_build_args:
+        required: false
+        type: string
       check_lib:
         required: false
         type: boolean
@@ -141,6 +144,7 @@ jobs:
       toolchain: ${{ inputs.building_toolchain }}
       build_whole_workspace: ${{ inputs.build_whole_workspace }}
       custom_step: ${{ matrix.custom_step }}
+      additional_build_args: ${{ inputs.additional_build_args }}
       check_lib: ${{ inputs.check_lib }}
       check_lib_no_default_features: ${{ inputs.check_lib_no_default_features }}
       check_bins: ${{ inputs.check_bins }}
