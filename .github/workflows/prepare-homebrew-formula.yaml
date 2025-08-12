@@ -27,7 +27,7 @@ on:
         required: false
         type: string
         default: ${{ github.event.repository.name }}
-      depends_on:
+      build_depends_on:
         required: false
         type: string
     outputs:
@@ -85,7 +85,7 @@ jobs:
         if: ${{ steps.check-formula.outputs.exists == 'false' }}
         shell: pwsh
         env:
-          DEPENDS_ON: ${{ inputs.depends_on }}
+          BUILD_DEPENDS_ON: ${{ inputs.build_depends_on }}
         run: |
           echo "HOMEBREW_NO_ENV_HINTS=TRUE" >> $GITHUB_ENV
           brew tap ${{ inputs.tap_owner }}/${{ inputs.tap_name }}
@@ -118,8 +118,8 @@ jobs:
           $sha256 = (Get-FileHash -Path $tag_path -Algorithm SHA256).Hash.ToLower()
 
           $deps = 'depends_on "rust" => :build'
-          if ($env:DEPENDS_ON) {
-              $env:DEPENDS_ON -split "`r`n|`n|`r" | Where-Object { $_ -ne "" } | ForEach-Object {
+          if ($env:BUILD_DEPENDS_ON) {
+              $env:BUILD_DEPENDS_ON -split "`r`n|`n|`r" | Where-Object { $_ -ne "" } | ForEach-Object {
                   $deps += "`n" + "depends_on `"$_`" => :build"
               }
           }

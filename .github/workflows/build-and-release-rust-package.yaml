@@ -25,7 +25,7 @@ on:
         required: false
         type: boolean
         default: false
-      brew_depends_on:
+      brew_build_depends_on:
         required: false
         type: string
       linux_x86_dependencies:
@@ -128,7 +128,7 @@ jobs:
       ASIMOV_APP_ID: ${{ secrets.ASIMOV_APP_ID }}
       ASIMOV_APP_PRIVATE_KEY: ${{ secrets.ASIMOV_APP_PRIVATE_KEY }}
     with:
-      depends_on: ${{ inputs.brew_depends_on }}
+      build_depends_on: ${{ inputs.brew_build_depends_on }}
 
   build:
     needs: prepare-homebrew
