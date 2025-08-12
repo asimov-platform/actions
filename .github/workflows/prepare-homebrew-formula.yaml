@@ -27,10 +27,9 @@ on:
         required: false
         type: string
         default: ${{ github.event.repository.name }}
-      depends_on_openssl:
+      depends_on:
         required: false
-        type: boolean
-        default: false
+        type: string
     outputs:
       bump_formula:
         value: ${{ jobs.update-homebrew-tap.outputs.bump_formula }}
@@ -86,7 +85,7 @@ jobs:
         if: ${{ steps.check-formula.outputs.exists == 'false' }}
         shell: pwsh
         env:
-          DEPENDS_ON_OPENSSL: ${{ inputs.depends_on_openssl }}
+          DEPENDS_ON: ${{ inputs.depends_on }}
         run: |
           echo "HOMEBREW_NO_ENV_HINTS=TRUE" >> $GITHUB_ENV
           brew tap ${{ inputs.tap_owner }}/${{ inputs.tap_name }}
@@ -119,8 +118,10 @@ jobs:
           $sha256 = (Get-FileHash -Path $tag_path -Algorithm SHA256).Hash.ToLower()
 
           $deps = 'depends_on "rust" => :build'
-          if ($env:DEPENDS_ON_OPENSSL -eq 'true') {
-              $deps += "`n" + 'depends_on "openssl" => :build'
+          if ($env:DEPENDS_ON) {
+              $env:DEPENDS_ON -split "`r`n|`n|`r" | Where-Object { $_ -ne "" } | ForEach-Object {
+                  $deps += "`n" + "depends_on `"$_`" => :build"
+              }
           }
 
           $formula = @'
