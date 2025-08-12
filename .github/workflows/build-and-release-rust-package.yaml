@@ -28,6 +28,10 @@ on:
       brew_build_depends_on:
         required: false
         type: string
+      rust_toolchain:
+        required: false
+        type: string
+        default: "1.85.0"
       linux_x86_dependencies:
         required: false
         description: |
@@ -198,7 +202,7 @@ jobs:
       use_zigbuild: ${{ matrix.use-zigbuild || false }}
       glibc_version: ${{ matrix.glibc-version }}
       extension: ${{ matrix.extension }}
-      rust_toolchain: 1.85.0
+      rust_toolchain: ${{ inputs.rust_toolchain }}
 
   release:
     name: Release
