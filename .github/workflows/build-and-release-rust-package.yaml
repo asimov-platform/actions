@@ -71,6 +71,21 @@ on:
         description: |
           Windows dependencies step. Will be executed before the build.
         type: string
+      brew_linux_x86_dependencies:
+        required: false
+        description: |
+          Linux x86 dependencies step exclusive for Homebrew. Will be executed before the build.
+        type: string
+      brew_macos_x86_dependencies:
+        required: false
+        description: |
+          macOS x86 dependencies step exclusive for Homebrew. Will be executed before the build.
+        type: string
+      brew_macos_arm_dependencies:
+        required: false
+        description: |
+          macOS ARM dependencies step exclusive for Homebrew. Will be executed before the build.
+        type: string
       build-linux-x86-gnu:
         required: false
         description: Build Linux x86 GNU binary?
@@ -149,6 +164,7 @@ jobs:
             use-zigbuild: true
             glibc-version: 2.28
             custom-step: ${{ inputs.linux_x86_dependencies != '' && inputs.linux_x86_dependencies || inputs.linux_dependencies }}
+            custom-brew-step: ${{ inputs.brew_linux_x86_dependencies }}
           - enabled: ${{ inputs.build-linux-arm-gnu }}
             os: ubuntu-latest
             artifact: linux-arm-gnu
@@ -174,12 +190,14 @@ jobs:
             target: x86_64-apple-darwin
             build-homebrew-bottle: ${{ inputs.update_homebrew_tap }}
             custom-step: ${{ inputs.macos_x86_dependencies != '' && inputs.macos_x86_dependencies || inputs.macos_dependencies }}
+            custom-brew-step: ${{ inputs.brew_macos_x86_dependencies }}
           - enabled: ${{ inputs.build-macos-arm }}
             os: macos-15
             artifact: macos-arm
             target: aarch64-apple-darwin
             build-homebrew-bottle: ${{ inputs.update_homebrew_tap }}
             custom-step: ${{ inputs.macos_arm_dependencies != '' && inputs.macos_arm_dependencies || inputs.macos_dependencies }}
+            custom-brew-step: ${{ inputs.brew_macos_arm_dependencies }}
           - enabled: ${{ inputs.build-windows }}
             os: ${{ inputs.build-windows-native && 'windows-latest' || 'ubuntu-latest' }}
             artifact: windows-x64
@@ -197,6 +215,7 @@ jobs:
       artifact: ${{ matrix.artifact }}
       target: ${{ matrix.target }}
       custom_step: ${{ matrix.custom-step }}
+      custom_brew_step: ${{ matrix.custom-brew-step }}
       build_homebrew_bottle: ${{ matrix.build-homebrew-bottle || false }}
       bump_homebrew_formula: ${{ inputs.update_homebrew_tap && needs.prepare-homebrew.outputs.bump_formula == 'true' || false }}
       use_zigbuild: ${{ matrix.use-zigbuild || false }}
