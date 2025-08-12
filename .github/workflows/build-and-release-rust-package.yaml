@@ -199,7 +199,7 @@ jobs:
             custom-step: ${{ inputs.macos_arm_dependencies != '' && inputs.macos_arm_dependencies || inputs.macos_dependencies }}
             custom-brew-step: ${{ inputs.brew_macos_arm_dependencies }}
           - enabled: ${{ inputs.build-windows }}
-            os: ${{ inputs.build-windows-native && 'windows-latest' || 'ubuntu-latest' }}
+            os: ${{ inputs.build-windows-native && 'windows-2025' || 'ubuntu-latest' }}
             artifact: windows-x64
             target: ${{ inputs.build-windows-native && 'x86_64-pc-windows-msvc' || 'x86_64-pc-windows-gnu' }}
             extension: exe
