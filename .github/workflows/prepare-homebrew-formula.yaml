@@ -120,7 +120,12 @@ jobs:
           $deps = 'depends_on "rust" => :build'
           if ($env:BUILD_DEPENDS_ON) {
               $env:BUILD_DEPENDS_ON -split "`r`n|`n|`r" | Where-Object { $_ -ne "" } | ForEach-Object {
-                  $deps += "`n" + "depends_on `"$_`" => :build"
+                  $parts = $_ -split ' ', 2
+                  if ($parts.Length -gt 1) {
+                      $deps += "`n" + "depends_on `"$($parts[0])`" => :build $($parts[1])"
+                  } else {
+                      $deps += "`n" + "depends_on `"$_`" => :build"
+                  }
               }
           }
 
