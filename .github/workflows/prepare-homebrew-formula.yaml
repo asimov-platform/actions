@@ -135,7 +135,7 @@ jobs:
 
           $install_content = 'system "cargo", "install", *std_cargo_args'
           if ($env:INSTALL_STEP) {
-              $install_content = $env:INSTALL_STEP + "`n`n" + $install_content
+              $install_content = $env:INSTALL_STEP + "`n" + $install_content
           }
 
           $formula = @'
