@@ -28,6 +28,9 @@ on:
       brew_build_depends_on:
         required: false
         type: string
+      brew_install_step:
+        required: false
+        type: string
       rust_toolchain:
         required: false
         type: string
@@ -152,6 +155,7 @@ jobs:
       ASIMOV_APP_PRIVATE_KEY: ${{ secrets.ASIMOV_APP_PRIVATE_KEY }}
     with:
       build_depends_on: ${{ inputs.brew_build_depends_on }}
+      install_step: ${{ inputs.brew_install_step }}
 
   build:
     needs: prepare-homebrew

@@ -30,6 +30,9 @@ on:
       build_depends_on:
         required: false
         type: string
+      install_step:
+        required: false
+        type: string
     outputs:
       bump_formula:
         value: ${{ jobs.update-homebrew-tap.outputs.bump_formula }}
@@ -86,6 +89,7 @@ jobs:
         shell: pwsh
         env:
           BUILD_DEPENDS_ON: ${{ inputs.build_depends_on }}
+          INSTALL_STEP: ${{ inputs.install_step }}
         run: |
           echo "HOMEBREW_NO_ENV_HINTS=TRUE" >> $GITHUB_ENV
           brew tap ${{ inputs.tap_owner }}/${{ inputs.tap_name }}
@@ -129,6 +133,11 @@ jobs:
               }
           }
 
+          $install_content = 'system "cargo", "install", *std_cargo_args'
+          if ($env:INSTALL_STEP) {
+              $install_content = $env:INSTALL_STEP + "`n`n" + $install_content
+          }
+
           $formula = @'
           class {0} < Formula
             desc "{1}"
@@ -146,7 +155,7 @@ jobs:
           {6}
 
             def install
-              system "cargo", "install", *std_cargo_args
+          {7}
             end
 
             test do
@@ -160,7 +169,8 @@ jobs:
             $tag_url, `
             $sha256, `
             "https://github.com/${{ github.repository }}.git", `
-            ($deps -replace "(?m)^", "  ") # indent
+            ($deps -replace "(?m)^", "  "), `
+            ($install_content -replace "(?m)^", "    ")
 
           cd "$(brew --repository ${{ inputs.tap_owner }}/${{ inputs.tap_name }})"
 
