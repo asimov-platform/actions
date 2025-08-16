@@ -41,6 +41,9 @@ on:
       additional_build_args:
         required: false
         type: string
+      env:
+        required: false
+        type: string
       check_lib:
         required: true
         type: boolean
@@ -60,6 +63,9 @@ on:
       check_doctests:
         required: true
         type: boolean
+    secrets:
+      ENV:
+        required: false
 
 env:
   CARGO_TERM_COLOR: always
@@ -75,6 +81,11 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Set environment variables
+        uses: asimov-platform/actions/set-env-vars@master
+        with:
+          env: ${{ inputs.env }}
+          secret_env: ${{ secrets.ENV }}
       - name: Install dependencies
         if: ${{ inputs.custom_step != '' }}
         run: ${{ inputs.custom_step }}

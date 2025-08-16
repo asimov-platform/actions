@@ -48,11 +48,16 @@ on:
         required: false
         type: string
         default: "stable"
+      env:
+        required: false
+        type: string
     secrets:
       ASIMOV_APP_ID:
         required: true
       ASIMOV_APP_PRIVATE_KEY:
         required: true
+      ENV:
+        required: false
 
 jobs:
   build-rust-package:
@@ -60,6 +65,11 @@ jobs:
     if: ${{ inputs.enabled }}
     runs-on: ${{ inputs.os }}
     steps:
+      - name: Set environment variables
+        uses: asimov-platform/actions/set-env-vars@master
+        with:
+          env: ${{ inputs.env }}
+          secret_env: ${{ secrets.ENV }}
       - name: Install dependencies
         if: ${{ inputs.custom_step != '' }}
         run: ${{ inputs.custom_step }}
@@ -78,6 +88,11 @@ jobs:
     if: ${{ inputs.enabled && inputs.build_homebrew_bottle }}
     runs-on: ${{ inputs.os }}
     steps:
+      - name: Set environment variables
+        uses: asimov-platform/actions/set-env-vars@master
+        with:
+          env: ${{ inputs.env }}
+          secret_env: ${{ secrets.ENV }}
       - name: Install dependencies
         if: ${{ inputs.custom_brew_step != '' }}
         run: ${{ inputs.custom_brew_step }}

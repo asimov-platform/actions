@@ -54,6 +54,9 @@ on:
       additional_build_args:
         required: false
         type: string
+      env:
+        required: false
+        type: string
       check_lib:
         required: false
         type: boolean
@@ -86,6 +89,8 @@ on:
       ASIMOV_APP_ID:
         required: false
       ASIMOV_APP_PRIVATE_KEY:
+        required: false
+      ENV:
         required: false
 
 permissions:
@@ -136,6 +141,8 @@ jobs:
     name: Check targets
     if: ${{ always() }}
     uses: asimov-platform/actions/.github/workflows/ci-rust-job.yaml@master
+    secrets:
+      ENV: ${{ secrets.ENV }}
     with:
       enabled: ${{ matrix.enabled }}
       name: ${{ matrix.name }}
@@ -145,6 +152,7 @@ jobs:
       build_whole_workspace: ${{ inputs.build_whole_workspace }}
       custom_step: ${{ matrix.custom_step }}
       additional_build_args: ${{ inputs.additional_build_args }}
+      env: ${{ inputs.env }}
       check_lib: ${{ inputs.check_lib }}
       check_lib_no_default_features: ${{ inputs.check_lib_no_default_features }}
       check_bins: ${{ inputs.check_bins }}

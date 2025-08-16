@@ -1,0 +1,35 @@
+# See: https://docs.github.com/en/actions/writing-workflows
+---
+name: Set Environment Variables
+description: Set environment variables
+
+inputs:
+  env:
+    required: false
+    description: Environment variables
+  secret_env:
+    required: false
+    description: Secret environment variables
+
+runs:
+  using: composite
+  steps:
+    - name: Set environment variables
+      if: ${{ inputs.env || inputs.secret_env }}
+      shell: pwsh
+      env:
+        ENV_VARS: ${{ inputs.env }}
+        SECRET_ENV_VARS: ${{ inputs.secret_env }}
+      run: |
+        if ($env:ENV_VARS) {
+          $env:ENV_VARS -split "`r?`n" | Where-Object { $_.Trim() } |
+            Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+        }
+
+        if ($env:SECRET_ENV_VARS) {
+          $env:SECRET_ENV_VARS -split "`r?`n" | Where-Object { $_.Trim() } | ForEach-Object {
+            $name, $value = $_ -split '=', 2
+            echo "::add-mask::$value"
+            echo "$name=$value" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          }
+        }
