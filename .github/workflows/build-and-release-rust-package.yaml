@@ -243,7 +243,7 @@ jobs:
 
   release:
     name: Release
-    if: ${{ inputs.create_release && startsWith(github.ref, 'refs/tags/') }}
+    if: ${{ !failure() && !cancelled() && inputs.create_release && startsWith(github.ref, 'refs/tags/') }}
     needs: build
     uses: asimov-platform/actions/.github/workflows/release-rust-package.yaml@master
     secrets:
