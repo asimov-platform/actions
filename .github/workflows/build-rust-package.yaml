@@ -48,6 +48,10 @@ on:
         required: false
         type: string
         default: "stable"
+      files-to-copy:
+        required: false
+        type: string
+        default: ""
       env:
         required: false
         type: string
@@ -83,6 +87,7 @@ jobs:
           use-zigbuild: ${{ inputs.use_zigbuild || 'false' }}
           glibc-version: ${{ inputs.glibc_version }}
           rust-toolchain: ${{ inputs.rust_toolchain }}
+          files-to-copy: ${{ inputs.files-to-copy }}
   build-homebrew-bottle:
     name: Build ${{ inputs.artifact }} bottle
     if: ${{ inputs.enabled && inputs.build_homebrew_bottle }}

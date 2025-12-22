@@ -139,6 +139,11 @@ on:
         description: Build Windows binary natively (meaning on Windows, without cross-compiling)?
         type: boolean
         default: false
+      files-to-copy:
+        description: "Files to package along with the binary. New line separated. Defaults to empty string."
+        required: false
+        type: string
+        default: ""
     outputs:
       release_url:
         description: Release URL
@@ -239,6 +244,7 @@ jobs:
       glibc_version: ${{ matrix.glibc-version }}
       extension: ${{ matrix.extension }}
       rust_toolchain: ${{ inputs.rust_toolchain }}
+      files-to-copy: ${{ inputs.files-to-copy }}
       env: ${{ inputs.env }}
 
   release:
