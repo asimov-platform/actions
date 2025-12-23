@@ -52,6 +52,10 @@ on:
         required: false
         type: string
         default: ""
+      pre-compress-pass:
+        required: false
+        type: string
+        default: ""
       env:
         required: false
         type: string
@@ -88,6 +92,7 @@ jobs:
           glibc-version: ${{ inputs.glibc_version }}
           rust-toolchain: ${{ inputs.rust_toolchain }}
           files-to-copy: ${{ inputs.files-to-copy }}
+          pre-compress-pass: ${{ inputs.pre-compress-pass }}
   build-homebrew-bottle:
     name: Build ${{ inputs.artifact }} bottle
     if: ${{ inputs.enabled && inputs.build_homebrew_bottle }}

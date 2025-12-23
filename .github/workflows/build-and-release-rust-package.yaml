@@ -144,6 +144,11 @@ on:
         required: false
         type: string
         default: ""
+      pre-compress-pass:
+        description: "Code that will be executed before compressing the artifact. Defaults to empty string."
+        required: false
+        type: string
+        default: ""
     outputs:
       release_url:
         description: Release URL
@@ -245,6 +250,7 @@ jobs:
       extension: ${{ matrix.extension }}
       rust_toolchain: ${{ inputs.rust_toolchain }}
       files-to-copy: ${{ inputs.files-to-copy }}
+      pre-compress-pass: ${{ inputs.pre-compress-pass }}
       env: ${{ inputs.env }}
 
   release:
