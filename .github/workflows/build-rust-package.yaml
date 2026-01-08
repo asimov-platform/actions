@@ -36,6 +36,10 @@ on:
         required: false
         type: boolean
         default: false
+      use_ndk:
+        required: false
+        type: boolean
+        default: false
       glibc_version:
         required: false
         type: string
@@ -89,6 +93,7 @@ jobs:
           artifact-suffix: ${{ inputs.artifact }}
           binary-extension: ${{ inputs.extension }}
           use-zigbuild: ${{ inputs.use_zigbuild || 'false' }}
+          use-ndk: ${{ inputs.use_ndk || 'false' }}
           glibc-version: ${{ inputs.glibc_version }}
           rust-toolchain: ${{ inputs.rust_toolchain }}
           files-to-copy: ${{ inputs.files-to-copy }}

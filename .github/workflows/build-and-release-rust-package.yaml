@@ -78,6 +78,11 @@ on:
         description: |
           Windows dependencies step. Will be executed before the build.
         type: string
+      android_arm_dependencies:
+        required: false
+        description: |
+          Android ARM dependencies step. Will be executed before the build.
+        type: string
       brew_linux_x86_dependencies:
         required: false
         description: |
@@ -137,6 +142,11 @@ on:
       build-windows-native:
         required: false
         description: Build Windows binary natively (meaning on Windows, without cross-compiling)?
+        type: boolean
+        default: false
+      build-android-arm:
+        required: false
+        description: Build Android ARM binary?
         type: boolean
         default: false
       files-to-copy:
@@ -230,6 +240,12 @@ jobs:
             target: ${{ inputs.build-windows-native && 'x86_64-pc-windows-msvc' || 'x86_64-pc-windows-gnu' }}
             extension: exe
             custom-step: ${{ inputs.windows_dependencies }}
+          - enabled: ${{ inputs.build-android-arm }}
+            os: ubuntu-latest
+            artifact: android-arm
+            target: aarch64-linux-android
+            use-ndk: true
+            custom-step: ${{ inputs.android_arm_dependencies  }}
     name: Build module
     uses: asimov-platform/actions/.github/workflows/build-rust-package.yaml@master
     secrets:
@@ -246,6 +262,7 @@ jobs:
       build_homebrew_bottle: ${{ matrix.build-homebrew-bottle || false }}
       bump_homebrew_formula: ${{ inputs.update_homebrew_tap && needs.prepare-homebrew.outputs.bump_formula == 'true' || false }}
       use_zigbuild: ${{ matrix.use-zigbuild || false }}
+      use_ndk: ${{ matrix.use-ndk || false }}
       glibc_version: ${{ matrix.glibc-version }}
       extension: ${{ matrix.extension }}
       rust_toolchain: ${{ inputs.rust_toolchain }}
