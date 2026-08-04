@@ -22,6 +22,10 @@ on:
         required: false
         type: string
         default: "1.93.0"
+      working_directory:
+        required: false
+        type: string
+        default: .
       check_formatting:
         required: false
         type: boolean
@@ -104,6 +108,9 @@ jobs:
     name: Check formatting
     if: ${{ inputs.check_formatting }}
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -149,6 +156,7 @@ jobs:
       os: ${{ matrix.os }}
       target: ${{ matrix.target }}
       toolchain: ${{ inputs.building_toolchain }}
+      working_directory: ${{ inputs.working_directory }}
       build_whole_workspace: ${{ inputs.build_whole_workspace }}
       custom_step: ${{ matrix.custom_step }}
       additional_build_args: ${{ inputs.additional_build_args }}

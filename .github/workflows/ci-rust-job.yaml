@@ -31,6 +31,10 @@ on:
       toolchain:
         required: true
         type: string
+      working_directory:
+        required: false
+        type: string
+        default: .
       build_whole_workspace:
         required: false
         type: boolean
@@ -75,6 +79,9 @@ jobs:
     name: Check ${{ inputs.name }}
     if: ${{ inputs.enabled }}
     runs-on: ${{ inputs.os }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
