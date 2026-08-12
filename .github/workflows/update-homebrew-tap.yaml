@@ -80,6 +80,7 @@ jobs:
         run: |
           echo "HOMEBREW_NO_ENV_HINTS=TRUE" >> $GITHUB_ENV
           brew tap ${{ inputs.tap_owner }}/${{ inputs.tap_name }}
+          brew trust --tap ${{ inputs.tap_owner }}/${{ inputs.tap_name }}
       - name: Fetch formula
         shell: bash
         run: brew fetch --formula --retry ${{ inputs.tap_owner }}/${{ inputs.tap_name }}/${{ inputs.formula_name }} --force
