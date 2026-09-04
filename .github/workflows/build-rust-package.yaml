@@ -52,6 +52,13 @@ on:
         required: false
         type: string
         default: "stable"
+      working_directory:
+        required: false
+        description: |
+          Directory that contains the crate to build, relative to the repository root.
+          Use a top-level directory name. The name becomes part of the artifact name.
+        type: string
+        default: .
       files-to-copy:
         required: false
         type: string
@@ -77,6 +84,8 @@ jobs:
     if: ${{ inputs.enabled }}
     runs-on: ${{ inputs.os }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Set environment variables
         uses: asimov-platform/actions/set-env-vars@master
         with:
@@ -89,7 +98,13 @@ jobs:
         uses: asimov-platform/build-rust-action@v6
         with:
           target: ${{ inputs.target }}
-          gh-artifact-prefix: "file-"
+          # Do not let the action check out the repository. The action checks out
+          # into `working-directory`, which is wrong when that is a subdirectory.
+          checkout: false
+          working-directory: ${{ inputs.working_directory }}
+          # Include the directory in the artifact name so that crates in
+          # different directories of one repository do not collide.
+          gh-artifact-prefix: ${{ inputs.working_directory == '.' && 'file-' || format('file-{0}-', inputs.working_directory) }}
           artifact-suffix: ${{ inputs.artifact }}
           binary-extension: ${{ inputs.extension }}
           use-zigbuild: ${{ inputs.use_zigbuild || 'false' }}

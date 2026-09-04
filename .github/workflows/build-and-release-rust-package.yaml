@@ -13,6 +13,13 @@ on:
         required: false
         type: boolean
         default: true
+      working_directory:
+        required: false
+        description: |
+          Directory that contains the crate to build, relative to the repository root.
+          Use a top-level directory name. The name becomes part of the artifact name.
+        type: string
+        default: .
       update_homebrew_tap:
         required: false
         type: boolean
@@ -266,6 +273,7 @@ jobs:
       glibc_version: ${{ matrix.glibc-version }}
       extension: ${{ matrix.extension }}
       rust_toolchain: ${{ inputs.rust_toolchain }}
+      working_directory: ${{ inputs.working_directory }}
       files-to-copy: ${{ inputs.files-to-copy }}
       pre-compress-pass: ${{ inputs.pre-compress-pass }}
       env: ${{ inputs.env }}
