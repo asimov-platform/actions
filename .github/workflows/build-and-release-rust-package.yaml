@@ -13,6 +13,13 @@ on:
         required: false
         type: boolean
         default: true
+      changelog_path:
+        required: false
+        description: |
+          Path to the changelog file, relative to the repository root.
+          The release notes come from this file.
+        type: string
+        default: "CHANGES.md"
       working_directory:
         required: false
         description: |
@@ -286,6 +293,8 @@ jobs:
     secrets:
       ASIMOV_APP_ID: ${{ secrets.ASIMOV_APP_ID }}
       ASIMOV_APP_PRIVATE_KEY: ${{ secrets.ASIMOV_APP_PRIVATE_KEY }}
+    with:
+      changelog_path: ${{ inputs.changelog_path }}
 
   update-scoop-bucket:
     name: Update Scoop bucket

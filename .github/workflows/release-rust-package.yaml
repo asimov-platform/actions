@@ -34,5 +34,5 @@ jobs:
         with:
           app_id: ${{ secrets.ASIMOV_APP_ID }}
           app_private_key: ${{ secrets.ASIMOV_APP_PRIVATE_KEY }}
-          changelog-path: CHANGES.md
+          changelog-path: ${{ inputs.changelog_path }}
           pattern: "file-*"
