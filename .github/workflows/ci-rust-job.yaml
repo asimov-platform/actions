@@ -78,7 +78,7 @@ jobs:
   check-targets:
     name: Check ${{ inputs.name }}
     if: ${{ inputs.enabled }}
-    runs-on: ${{ inputs.os }}
+    runs-on: ${{ inputs.os == 'macos-15' && fromJSON('["self-hosted", "macOS"]') || inputs.os }}
     defaults:
       run:
         working-directory: ${{ inputs.working_directory }}
