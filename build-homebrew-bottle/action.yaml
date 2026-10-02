@@ -57,6 +57,18 @@ runs:
       run: |
         echo "HOMEBREW_NO_ENV_HINTS=TRUE" >> $GITHUB_ENV
         brew tap ${{ inputs.tap_owner }}/${{ inputs.tap_name }}
+    # The macOS runner image links bin/openssl to openssl@1.1 by hand, outside of
+    # Homebrew's control, so `brew unlink` won't remove it and openssl@3 fails to link.
+    # Image: https://github.com/actions/runner-images/blob/6d942e630479cd99a93dadfc766af11242bfa402/images/macos/scripts/build/install-openssl.sh
+    # Homebrew: https://github.com/Homebrew/homebrew-core/pull/313581
+    - name: Remove stale openssl@1.1 symlink
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      run: |
+        openssl_link="$(brew --prefix)/bin/openssl"
+        if [[ "$(readlink "$openssl_link" 2>/dev/null)" == */openssl@1.1/* ]]; then
+          rm "$openssl_link"
+        fi
     - name: Fetch dependencies
       shell: pwsh
       run: |
